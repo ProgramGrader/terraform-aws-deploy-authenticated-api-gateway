@@ -21,7 +21,6 @@ provider "aws" {
 
 module "openapi_authenticated_api_gateway"{
   source = "../../"
-  account_id        = var.account_id
   api_gateway_name  = "TestAuthApi"
   region            = var.region
 }
