@@ -2,11 +2,6 @@
 ## REQUIRED ##
 ##############
 
-variable "account_id" {
-  description = "Your aws account id"
-  type        = string
-}
-
 variable "region" {
   type = string
 }

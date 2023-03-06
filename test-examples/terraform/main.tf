@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "tfstate-3ea6z45i"
-    key    = "terraform-auth-openapi-api/key"
+    key    = "terraform-deploy-authenticated-apigw/key"
     region = "us-east-2"
     dynamodb_table = "app-state"
     encrypt = true
