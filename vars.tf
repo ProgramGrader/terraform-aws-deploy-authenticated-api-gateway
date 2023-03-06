@@ -15,9 +15,6 @@ variable "api_gateway_name" {
   type = string
 }
 
-variable "openapi_spec_json" {
-  type = string
-}
 ##################
 ## NON-REQUIRED ##
 ##################

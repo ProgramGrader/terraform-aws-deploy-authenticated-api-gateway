@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.allopen") version "1.7.22"
     id("io.quarkus")
+    id("org.graalvm.buildtools.native") version "0.9.19"
 }
 
 repositories {
@@ -42,4 +43,12 @@ allOpen {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     kotlinOptions.javaParameters = true
+}
+
+graalvmNative {
+    binaries.all{
+        resources.autodetect()
+    }
+    toolchainDetection.set(false)
+
 }

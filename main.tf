@@ -1,7 +1,6 @@
 resource "aws_api_gateway_rest_api" "api" {
   name          = var.api_gateway_name
   description = var.api_gateway_description
-  body = var.openapi_spec_json
   api_key_source = "AUTHORIZER"
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -90,6 +89,7 @@ resource "aws_api_gateway_authorizer" "Token_Authorizer" {
   rest_api_id            = aws_api_gateway_rest_api.api.id
   authorizer_uri         = module.Deployer.lambda_invoke_arn["Authorizer"]
   authorizer_credentials = aws_iam_role.invocation_role.arn
+  type = "TOKEN"
 }
 
 

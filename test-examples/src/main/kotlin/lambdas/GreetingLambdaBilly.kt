@@ -10,11 +10,13 @@ import javax.inject.Named
 
 
 // https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html
-@Named("GreetingLambdaChris")
-class GreetingLambdaChris : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+@Named("GreetingLambdaBilly")
+class GreetingLambdaBilly : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
+        
+        val name = input.queryStringParameters["name"]
         return APIGatewayProxyResponseEvent()
-            .withBody("Hello " + input.pathParameters["name"] + " Chris")
+            .withBody("Hello $name")
             .withStatusCode(200)
     }
 }

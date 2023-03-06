@@ -1,4 +1,5 @@
-resource "local_file" "sqs_sns_output" {
+resource "local_file" "config_output" {
+  depends_on = [module.Deployer]
   filename = "LambdaAuthorizer/main/resources/application.conf"
   content = jsonencode(
     {
