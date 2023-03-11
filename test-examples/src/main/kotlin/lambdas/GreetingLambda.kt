@@ -10,8 +10,8 @@ import javax.inject.Named
 
 
 // https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html
-@Named("GreetingLambdaBilly")
-class GreetingLambdaBilly : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+@Named("GreetingLambda")
+class GreetingLambda : RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         
         val name = input.queryStringParameters["name"]

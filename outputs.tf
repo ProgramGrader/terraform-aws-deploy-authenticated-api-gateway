@@ -1,10 +1,13 @@
+
+// This file needs to be in the same directory as the lambda, for simplicity
 resource "local_file" "config_output" {
-  depends_on = [module.Deployer]
-  filename = "LambdaAuthorizer/main/resources/application.conf"
+  filename = "${path.module}/LambdaAuthorizer/src/main/kotlin/application.conf"
   content = jsonencode(
     {
       "API_ARN"= aws_api_gateway_rest_api.api.arn
+      "SECRET_KEY" = aws_secretsmanager_secret.secret.name
       "REGION"=var.region
+      "ACCOUNT_ID"= var.account_id
     })
 }
 
