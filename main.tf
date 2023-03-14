@@ -119,7 +119,8 @@ resource "aws_api_gateway_authorizer" "Token_Authorizer" {
   name                   = "APITokenAuthorizer"
   rest_api_id            = aws_api_gateway_rest_api.api.id
   authorizer_uri         = module.Deployer.lambda_invoke_arn["LambdaAuthorizer"]
-  authorizer_credentials = aws_iam_role. invocation_role.arn
+  authorizer_credentials = aws_iam_role.invocation_role.arn
+#  identity_source                  = "method.request.header.Authorizer"
   //type = "TOKEN"
 }
 

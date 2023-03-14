@@ -55,7 +55,8 @@ resource "aws_api_gateway_resource" "greeting_resource" {
 
 resource "aws_api_gateway_method" "GET" {
   depends_on = [module.authenticated_api_gateway]
-  authorization = "None"
+  authorization = "Custom"
+  authorizer_id = module.authenticated_api_gateway.authorizer_id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.greeting_resource.id
   rest_api_id   = module.authenticated_api_gateway.api_gateway_id
@@ -68,7 +69,7 @@ resource "aws_api_gateway_method" "GET" {
 resource "aws_api_gateway_integration" "integrate_get" {
   depends_on              = [module.authenticated_api_gateway]
   http_method             = aws_api_gateway_method.GET.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   resource_id             = aws_api_gateway_resource.greeting_resource.id
   rest_api_id             = module.authenticated_api_gateway.api_gateway_id
   type                    = "AWS_PROXY"
@@ -92,4 +93,57 @@ resource "aws_api_gateway_stage" "dev"{
   stage_name    = "dev"
   xray_tracing_enabled = true
 }
+resource "aws_api_gateway_method_settings" "general_settings" {
+  rest_api_id = module.authenticated_api_gateway.api_gateway_id
+  stage_name  = aws_api_gateway_stage.dev.stage_name
+  method_path = "*/*"
+
+  settings {
+    # Enable CloudWatch logging and metrics
+    metrics_enabled    = true
+    data_trace_enabled = true
+    logging_level      = "INFO"
+
+    # Limit the rate of calls to prevent abuse and unwanted charges
+    throttling_rate_limit  = 100
+    throttling_burst_limit = 50
+  }
+}
+
+resource "aws_api_gateway_account" "demo" {
+  cloudwatch_role_arn = data.aws_iam_role.cloudwatch.arn
+}
+
+data "aws_iam_role" "cloudwatch" {
+  name               = "api_gateway_cloudwatch_global"
+}
+
+
+resource "aws_iam_role_policy" "cloudwatch" {
+  name = "default"
+  role = data.aws_iam_role.cloudwatch.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+
 
