@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         images: [LambdaAuthorizer]
-        working_dir: LambdaAuthorizer/
+        working_dir: [LambdaAuthorizer/]
     # ECR_REPOSITORY: ACTUAL NAME OF THE ECR
     steps:
       - name: Check out code
