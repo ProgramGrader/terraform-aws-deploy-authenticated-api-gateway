@@ -25,6 +25,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("io.quarkiverse.amazonservices:quarkus-amazon-secretsmanager:1.4.0")
     implementation("software.amazon.awssdk:url-connection-client:2.19.13")
+    implementation("io.quarkiverse.amazonservices:quarkus-amazon-ssm:1.4.0")
     testImplementation("io.quarkus:quarkus-junit5")
 }
 

@@ -34,10 +34,19 @@ module "Deployer" {
   ecr_tags = {
     Type    = "lambda"
     Version = "latest"
-  }
+    }
   lambda_file_name                = ["GreetingLambda"]
   lambda_project_directory        = "../"
   region                          = var.region
+}
+
+
+resource "aws_lambda_permission" "allow_apigw_to_trigger_Greeting_lambda" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = "ScheduleAssignment"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${module.authenticated_api_gateway.api_gateway_execution_arn}/*/*"
 }
 
 resource "aws_api_gateway_resource" "greeting_resource" {
@@ -59,7 +68,7 @@ resource "aws_api_gateway_method" "GET" {
   }
 }
 
-resource "aws_api_gateway_integration" "integrate_deleteAssignment" {
+resource "aws_api_gateway_integration" "integrate_get" {
   depends_on              = [module.authenticated_api_gateway]
   http_method             = aws_api_gateway_method.GET.http_method
   integration_http_method = "GET"
@@ -68,3 +77,22 @@ resource "aws_api_gateway_integration" "integrate_deleteAssignment" {
   type                    = "AWS_PROXY"
   uri                     = module.Deployer.lambda_invoke_arn["GreetingLambda"]
 }
+
+resource "aws_api_gateway_deployment" "deploy" {
+  depends_on = [aws_api_gateway_integration.integrate_get]
+  rest_api_id = module.authenticated_api_gateway.api_gateway_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  description = "Deployed endpoint at ${timestamp()}"
+}
+
+resource "aws_api_gateway_stage" "dev"{
+  deployment_id = aws_api_gateway_deployment.deploy.id
+  rest_api_id= module.authenticated_api_gateway.api_gateway_id
+  stage_name    = "dev"
+  xray_tracing_enabled = true
+}
+

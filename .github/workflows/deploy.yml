@@ -1,0 +1,122 @@
+name: Deploy to ECR
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [main]
+
+jobs:
+
+  build:
+
+    name: Build Image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        images: [LambdaAuthorizer]
+        working_dir: LambdaAuthorizer/
+    # ECR_REPOSITORY: ACTUAL NAME OF THE ECR
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run native Tests
+        env:
+          USERNAME: ${{secrets.GITHUB_USERNAME}}
+          TOKEN: ${{secrets.TOKEN}}
+        continue-on-error: true
+        working-directory: matrix.working_dir
+        run: |
+          echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          java --version
+          gu --version
+          native-image --version
+          chmod +x gradlew
+          ./gradlew -Pagent nativeTest
+      
+
+      ## -print0 option is used to separate the file names with null characters instead of newlines
+      - name: Copy test configuration files to src/main/resources directory
+        working-directory: matrix.working_dir
+        run: |
+          find "build/native/agent-output/test/" -type f -print0 | while IFS= read -r -d '' file; do
+          cp "$file" "src/main/resources"
+          done
+          
+          rm -rf "build/native/"
+      - name: Updating lambda handler in application.properties
+        working-directory: matrix.working_dir
+        env:
+          LAMBDA_NAME: ${{matrix.images}}
+        run: |
+          value=${LAMBDA_NAME}
+          PROPERTIES_FILE_LOCATION=src/main/resources/application.properties
+          
+          update_properties_file() {
+          # Check if file exists and read its contents into an array.
+          if [ -f "$PROPERTIES_FILE_LOCATION" ]; then
+          mapfile -t ht < "$PROPERTIES_FILE_LOCATION"
+          else
+          ht=()
+          fi
+          
+          # Find the index of the "quarkus.lambda.handler" line if it exists.
+          i=0
+          while [[ -n "${ht[$i]}" && "${ht[$i]}" != *"quarkus.lambda.handler"* && "$i" -lt "${#ht[@]}" ]]; do
+          ((i++))
+          done
+          
+          # Update or add the "quarkus.lambda.handler" line.
+          if [[ "${ht[$i]}" == *"quarkus.lambda.handler"* ]]; then
+          ht[$i]="quarkus.lambda.handler=$value"
+          else
+          ht+=("quarkus.lambda.handler=$value")
+          fi
+          
+          # Write the updated array back to the input file.
+          printf "%s\n" "${ht[@]}" > "$PROPERTIES_FILE_LOCATION"
+          }
+          
+          update_properties_file "$value"
+      - name: Build native executable
+        working-directory: matrix.working_dir
+        run: |
+          ./gradlew build -x test -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - id: lowercase-image
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{matrix.images}}
+
+      - name: Create ECR if does not exist
+        id: create-ecr
+        uses: int128/create-ecr-repository-action@v1
+        with:
+          repository: ${{steps.lowercase-image.outputs.lowercase}}
+
+      - name: Build, tag, and push image to Amazon ECR
+        working-directory: matrix.working_dir
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{steps.lowercase-image.outputs.lowercase}}
+          IMAGE_TAG: latest
+        run: |
+          docker build -f src/main/docker/Dockerfile.native -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

@@ -17,21 +17,10 @@ import javax.inject.Named
 @Named("LambdaAuthorizer")
 class LambdaAuthorizer:RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicy> {
 
-   private val configPath = Config().findConfigPath()
+   private val config = Config().build()
 
-    private val config = configPath?.let {
-        model.Config.builder().build(it.toString())
-    } ?: throw IllegalStateException("Could not find configuration file.")
     override fun handleRequest(input: APIGatewayCustomAuthorizerEvent?, context: Context?): AuthPolicy {
         val logger = context?.logger
-
-        logger?.log("INFO: REGION: ${config.REGION} ")
-        logger?.log("INFO: API_ARN: ${config.API_ARN} ")
-        logger?.log("INFO: SECRET_TOKEN: ${config.SECRET_KEY} ")
-        logger?.log("INFO: ACCOUNT_ID: ${config.ACCOUNT_ID} ")
-        logger?.log("INFO: method_arn: ${input?.methodArn} ")
-        logger?.log("INFO: RESOURCE_PATH: ${input?.resource} ")
-        logger?.log("INFO: method: ${input?.httpMethod} ")
 
         val allowPolicy = AuthPolicy(
             principalId = "1",
@@ -63,12 +52,16 @@ class LambdaAuthorizer:RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolic
 
         val token = input.authorizationToken
 
-        val secret = getValue(config.SECRET_KEY)
+        val secret = getValue(config.AUTHENTICATOR_KEY)
 
         return if (token != secret) {
+            logger?.log(denyPolicy.toString())
             denyPolicy
-        }else
+        }else{
+            logger?.log(denyPolicy.toString())
             allowPolicy
+        }
+
     }
 
 

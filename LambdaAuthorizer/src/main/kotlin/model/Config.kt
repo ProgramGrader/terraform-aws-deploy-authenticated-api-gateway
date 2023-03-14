@@ -1,43 +1,27 @@
 package model
 
-import com.google.gson.Gson
-import java.io.File
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.ssm.SsmClient
+import software.amazon.awssdk.services.ssm.model.GetParameterRequest
 
 class Config() {
+    var REGION : String? = null
+    var AUTHENTICATOR_KEY: String? = null
 
-     var API_ARN : String? = null
-     var REGION : String? = null
-     var SECRET_KEY: String? = null
-     var ACCOUNT_ID: String? = null
-
-
-    class builder(){
-        private var config: Config? = null
-        fun build(configPath: String): Config?{
-            val jsonString: String
-            try {
-                jsonString = File(configPath).readText(Charsets.UTF_8)
-            }catch (ioException: IOException){
-                ioException.printStackTrace()
-                return null
-            }
-            val gson = Gson()
-            config= gson.fromJson(jsonString,Config::class.java)
-            return config
-        }
+    private var config: Config? = null
+    fun build(): Config{
+        AUTHENTICATOR_KEY= getParameter("csgrader/AUTHENTICATION_KEY")
+        REGION = getParameter("csgrader/REGION")
+        return config!!
     }
 
-    fun findConfigPath(): Path? {
-        val possiblePaths = listOf(
-            Paths.get("src/main/kotlin/application.conf").toAbsolutePath(), // path to the application.conf for testing env
-            Paths.get("application.conf").toAbsolutePath(), // path to the application.conf in image the path of this is defined in docker/DockerFile.native
-            // add more possible paths here
-        )
-
-        return possiblePaths.firstOrNull { Files.isRegularFile(it) }
+    private fun getParameter(parameterName: String): String? {
+        val ssmClient = SsmClient.builder()
+            .httpClient(software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient.builder().build())
+            .region(Region.US_EAST_2)
+            .build()
+        val request = GetParameterRequest.builder().name(parameterName).build()
+        val response = ssmClient.getParameter(request)
+        return response.parameter().value()
     }
 }
