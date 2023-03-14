@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        images: [GreetingLambda]
-        working_dir: [test-examples/]
+        images: [LambdaAuthorizer]
+        working_dir: [LambdaAuthorizer/] #[test-examples/]
     # ECR_REPOSITORY: ACTUAL NAME OF THE ECR
     steps:
       - name: Check out code
