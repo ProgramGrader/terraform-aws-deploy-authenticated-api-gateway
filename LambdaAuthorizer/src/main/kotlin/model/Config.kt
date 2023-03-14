@@ -8,11 +8,12 @@ class Config() {
     var REGION : String? = null
     var AUTHENTICATOR_KEY: String? = null
 
-    private var config: Config? = null
+
     fun build(): Config{
-        AUTHENTICATOR_KEY= getParameter("csgrader-AUTHENTICATION_KEY")
-        REGION = getParameter("csgrader-REGION")
-        return config!!
+        val config = Config()
+        config.AUTHENTICATOR_KEY= getParameter("csgrader-AUTHENTICATION_KEY")
+        config.REGION = getParameter("csgrader-REGION")
+        return config
     }
 
     private fun getParameter(parameterName: String): String? {
