@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         images: [GreetingLambda]
-        working_dir: test-examples/
+        working_dir: [test-examples/]
     # ECR_REPOSITORY: ACTUAL NAME OF THE ECR
     steps:
       - name: Check out code
