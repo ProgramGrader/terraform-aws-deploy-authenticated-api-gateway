@@ -31,7 +31,7 @@ jobs:
           USERNAME: ${{secrets.GITHUB_USERNAME}}
           TOKEN: ${{secrets.TOKEN}}
         continue-on-error: true
-        working-directory: matrix.working_dir
+        working-directory: ${{ matrix.working_dir }}
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
@@ -44,7 +44,7 @@ jobs:
 
       ## -print0 option is used to separate the file names with null characters instead of newlines
       - name: Copy test configuration files to src/main/resources directory
-        working-directory: matrix.working_dir
+        working-directory: ${{ matrix.working_dir }}
         run: |
           find "build/native/agent-output/test/" -type f -print0 | while IFS= read -r -d '' file; do
           cp "$file" "src/main/resources"
@@ -52,7 +52,7 @@ jobs:
           
           rm -rf "build/native/"
       - name: Updating lambda handler in application.properties
-        working-directory: matrix.working_dir
+        working-directory: ${{ matrix.working_dir }}
         env:
           LAMBDA_NAME: ${{matrix.images}}
         run: |
@@ -86,7 +86,7 @@ jobs:
           
           update_properties_file "$value"
       - name: Build native executable
-        working-directory: matrix.working_dir
+        working-directory: ${{ matrix.working_dir }}
         run: |
           ./gradlew build -x test -Dquarkus.package.type=native -Dquarkus.native.container-build=true
       - name: Configure AWS credentials
@@ -112,7 +112,7 @@ jobs:
           repository: ${{steps.lowercase-image.outputs.lowercase}}
 
       - name: Build, tag, and push image to Amazon ECR
-        working-directory: matrix.working_dir
+        working-directory: ${{ matrix.working_dir }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{steps.lowercase-image.outputs.lowercase}}
