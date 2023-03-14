@@ -10,8 +10,8 @@ class Config() {
 
     private var config: Config? = null
     fun build(): Config{
-        AUTHENTICATOR_KEY= getParameter("csgrader/AUTHENTICATION_KEY")
-        REGION = getParameter("csgrader/REGION")
+        AUTHENTICATOR_KEY= getParameter("csgrader-AUTHENTICATION_KEY")
+        REGION = getParameter("csgrader-REGION")
         return config!!
     }
 

@@ -12,13 +12,13 @@ output "api_gateway_execution_arn" {
 }
 
 resource "aws_ssm_parameter" "auth_key" {
-  name  = "csgrader/AUTHENTICATION_KEY"
+  name  = "csgrader-AUTHENTICATION_KEY"
   type  = "String"
   value = aws_secretsmanager_secret.secret.name
 }
 
 resource "aws_ssm_parameter" "region" {
-  name  = "csgrader/REGION"
+  name  = "csgrader-REGION"
   type  = "String"
   value = var.region
 }

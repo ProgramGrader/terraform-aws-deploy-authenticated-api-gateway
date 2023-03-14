@@ -29,14 +29,11 @@ module "authenticated_api_gateway"{
 module "Deployer" {
   source = "git::git@github.com:ProgramGrader/terraform-aws-kotlin-image-deploy-lambda.git"
   account_id                      = var.account_id
-  application_properties_location = "../src/main/resources"
-  docker_path                     = "../src/main/docker/Dockerfile.native"
   ecr_tags = {
     Type    = "lambda"
     Version = "latest"
     }
   lambda_file_name                = ["GreetingLambda"]
-  lambda_project_directory        = "../"
   region                          = var.region
 }
 
@@ -44,7 +41,7 @@ module "Deployer" {
 resource "aws_lambda_permission" "allow_apigw_to_trigger_Greeting_lambda" {
   statement_id = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = "ScheduleAssignment"
+  function_name = "GreetingLambda"
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.authenticated_api_gateway.api_gateway_execution_arn}/*/*"
 }

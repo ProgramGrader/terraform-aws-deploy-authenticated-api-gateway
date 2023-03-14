@@ -9,14 +9,12 @@ resource "aws_api_gateway_rest_api" "api" {
 module "Deployer"{
   source = "git::git@github.com:ProgramGrader/terraform-aws-kotlin-image-deploy-lambda.git"
   account_id                      = "048962136615"
-  application_properties_location = "${path.module}/LambdaAuthorizer/src/main/resources"
-  docker_path                     = "${path.module}/LambdaAuthorizer/src/main/docker/Dockerfile.native"
   ecr_tags = {
     Type    = "lambda"
     Version = "latest"
   }
+
   lambda_file_name                = ["LambdaAuthorizer"]
-  lambda_project_directory        = "${path.module}/LambdaAuthorizer"
   region                          = "us-east-2"
 }
 
@@ -99,7 +97,8 @@ resource "aws_iam_policy" "secrets-manager-policy" {
     "Version": "2012-10-17",
     "Statement": [{
       "Action": [
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:GetSecretValue",
+        "ssm:GetParameter"
 
       ],
       "Effect": "Allow",
