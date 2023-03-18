@@ -8,8 +8,8 @@ in request (The request token is placed in the header with the key Authenticatio
 
 
 ## Introduction
-In this repo you'll find an example to guide you on how to use this module 
-
+In this repo you'll find an implementation of a token based lambda authorizer (which needs to be deployed before 
+the authenticated api gateway) and an example demoing the use case of this module  
 
 ## Vars
 
