@@ -1,4 +1,5 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent
 import model.AuthPolicy
 import model.PolicyDocument
 import model.Statement
@@ -11,6 +12,7 @@ class TestLambdaAuthorizer {
     fun `LambdaAuth Failure`()
     {
 
+        //Request set up
         val request = APIGatewayCustomAuthorizerEvent()
         request.methodArn = "arn:aws:execute-api:us-east-1:123456789012:example/prod/POST/{proxy+}"
         request.httpMethod = "GET"
@@ -18,10 +20,11 @@ class TestLambdaAuthorizer {
         val headerMap = mutableMapOf<String,String>()
         headerMap["authorizationToken"] = "badtoken"
         request.headers = headerMap
-        val context = DummyContext()
-        val lambdaResponse = LambdaAuthorizer().handleRequest(request, context)
 
-        val testResponse = AuthPolicy(
+        // Calling v1 Authorizer
+        val context = DummyContext()
+        val v1lambdaResponse = APIGatewayV1Authorizer().handleRequest(request, context)
+        val testResponsev1 = AuthPolicy(
         principalId = "0",
         policyDocument = PolicyDocument(
             version = "2012-10-17",
@@ -34,7 +37,25 @@ class TestLambdaAuthorizer {
             )
         )
     )
-        assert(lambdaResponse == testResponse)
+        assert(v1lambdaResponse == testResponsev1 )
 
+    }
+
+
+    @Test
+    fun `LambdaAuth v2 Success` (){
+        val request = APIGatewayV2CustomAuthorizerEvent()
+        val context = DummyContext()
+
+        request.routeArn = "arn:aws:execute-api:us-east-1:123456789012:example/prod/POST/{proxy+}"
+        request.requestContext.http.method = "POST"
+
+
+        val headerMap= mutableMapOf<String,String>()
+        headerMap["Authorization"] = "badtoken"
+        request.headers = headerMap
+        val testResponsev2 = "{\"isAuthorized\": false}"
+        val v2lambdaResponse = APIGatewayV2Authorizer().handleRequest(request, context)
+        assert(v2lambdaResponse == testResponsev2 )
     }
 }
