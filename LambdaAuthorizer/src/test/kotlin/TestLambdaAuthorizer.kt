@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class TestLambdaAuthorizer {
 
     @Test
-    fun `LambdaAuth Failure`()
+    fun `LambdaAuth v1 FAILURE`()
     {
 
         //Request set up
@@ -43,7 +43,7 @@ class TestLambdaAuthorizer {
 
 
     @Test
-    fun `LambdaAuth v2 Success` (){
+    fun `LambdaAuth v2 FAILURE` (){
         val request = APIGatewayV2CustomAuthorizerEvent()
         val context = DummyContext()
 

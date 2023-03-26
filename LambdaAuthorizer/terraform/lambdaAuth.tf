@@ -5,7 +5,7 @@ module "Deployer"{
     Type    = "lambda"
     Version = "latest"
   }
-  lambda_file_name                = ["APIGatewayV1Authorizer, APIGatewayV2Authorizer"]
+  lambda_file_name                = ["APIGatewayV1Authorizer", "APIGatewayV2Authorizer"]
   region                          = "us-east-2"
 }
 
@@ -101,10 +101,11 @@ resource "aws_iam_role_policy_attachment" "attach_api_gw_v2_sm_perm"{
 
 
 resource "aws_secretsmanager_secret" "secret" {
-  //count = var.authenticator_exists == false ? 0 : 1
-  name = "AuthenticatorGateway"
+
+  name = "APIAuthenticationToken"
   recovery_window_in_days = 0
   force_overwrite_replica_secret = true
+
 }
 
 

@@ -19,7 +19,7 @@ variable "api_gateway_name" {
 }
 
 variable "gateway_version" {
-  type = string
+  type = number
 }
 
 ##################

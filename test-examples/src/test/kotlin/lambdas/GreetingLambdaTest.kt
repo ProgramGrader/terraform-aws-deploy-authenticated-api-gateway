@@ -1,7 +1,9 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import io.quarkus.test.junit.QuarkusTest
 import lambdas.DummyContext
-import lambdas.GreetingLambda
+import lambdas.GreetingLambdaV1
+import lambdas.GreetingLambdaV2
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -14,13 +16,24 @@ class GreetingLambdaTest {
 //        .withServices(LocalStackContainer.Service.DYNAMODB);
 
     @Test
-    fun `Greeting Success`() {
+    fun `Greeting APIGWV1 Success`() {
 
         val map = mutableMapOf<String,String>()
         map["name"]="Ed"
         val request = APIGatewayProxyRequestEvent().withQueryStringParameters(map)
         val context = DummyContext()
-        val response = GreetingLambda().handleRequest(request, context)
+        val response = GreetingLambdaV1().handleRequest(request, context)
+        assert(response.statusCode == 200)
+    }
+
+    @Test
+    fun `Greeting APIGWV2 Success`() {
+
+        val map = mutableMapOf<String,String>()
+        map["name"]="Ed"
+        val request = APIGatewayV2HTTPEvent.builder().withQueryStringParameters(map).build()
+        val context = DummyContext()
+        val response = GreetingLambdaV2().handleRequest(request, context)
         assert(response.statusCode == 200)
     }
 }
