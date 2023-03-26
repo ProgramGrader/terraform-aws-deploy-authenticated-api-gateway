@@ -27,3 +27,4 @@ data class Statement(
     @JsonProperty("Resource")
     val resource: String
 )
+

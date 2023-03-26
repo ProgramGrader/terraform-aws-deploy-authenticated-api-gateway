@@ -1,23 +1,20 @@
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient
-import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 import model.AuthPolicy
 import model.Config
 import model.PolicyDocument
 import model.Statement
-import java.util.*
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest
 import javax.inject.Named
 
-@Named("LambdaAuthorizer")
-class LambdaAuthorizer:RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicy> {
 
-   private val config = Config().build()
+@Named("APIGatewayV1Authorizer")
+class APIGatewayV1Authorizer: RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicy> {
+
+    private val config = Config().build()
 
     override fun handleRequest(input: APIGatewayCustomAuthorizerEvent?, context: Context?): AuthPolicy {
         val logger = context?.logger
@@ -58,14 +55,14 @@ class LambdaAuthorizer:RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolic
             logger?.log(denyPolicy.toString())
             denyPolicy
         }else{
-            logger?.log(denyPolicy.toString())
+            logger?.log(allowPolicy.toString())
             allowPolicy
         }
 
     }
 
 
-     fun getValue(secretName: String?) : String? {
+    fun getValue(secretName: String?) : String? {
 
         val valueRequest = GetSecretValueRequest.builder()
             .secretId(secretName)
@@ -81,4 +78,3 @@ class LambdaAuthorizer:RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolic
     }
 
 }
-

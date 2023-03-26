@@ -10,4 +10,5 @@ pluginManagement {
         id(quarkusPluginId) version quarkusPluginVersion
     }
 }
-rootProject.name="LambdaAuthorizer"
+
+rootProject.name="APIGatewayAuthorizer"

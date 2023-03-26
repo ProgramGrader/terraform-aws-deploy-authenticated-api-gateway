@@ -16,7 +16,7 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate-3ea6z45i"
-    key    = "AssignmentGradingMS/key"
+    key    = "LambdaAuthorizer/key"
     region = "us-east-2"
     dynamodb_table = "app-state"
     encrypt = true
@@ -24,11 +24,10 @@ terraform {
 
 }
 
-
 locals {
   shared_tags = {
     Terraform = "true"
-    Project = "AssignmentGradingMS"
+    Project = "LambdaAuthorizer"
   }
 }
 

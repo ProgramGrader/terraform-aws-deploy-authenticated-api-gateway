@@ -15,12 +15,6 @@ output "authorizer_id" {
   value = aws_api_gateway_authorizer.Token_Authorizer.id
 }
 
-resource "aws_ssm_parameter" "auth_key" {
-  name  = "csgrader-AUTHENTICATION_KEY"
-  type  = "String"
-  value = aws_secretsmanager_secret.secret.name
-  overwrite = true
-}
 
 resource "aws_ssm_parameter" "region" {
   name  = "csgrader-REGION"
