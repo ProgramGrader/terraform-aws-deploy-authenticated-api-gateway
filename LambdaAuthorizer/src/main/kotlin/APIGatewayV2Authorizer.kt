@@ -12,17 +12,6 @@ import javax.inject.Named
 class APIGatewayV2Authorizer: RequestHandler<APIGatewayV2CustomAuthorizerEvent, AuthPolicyV2> {
     private val config = Config().build()
 
-
-    /**
-     * {
-     *   "isAuthorized": true/false,
-     *   "context": {
-     *     "exampleKey": "exampleValue"
-     *   }
-     * }
-     *
-     */
-
     override fun handleRequest(input: APIGatewayV2CustomAuthorizerEvent?, context: Context?): AuthPolicyV2 {
         val logger = context?.logger
 
@@ -39,19 +28,20 @@ class APIGatewayV2Authorizer: RequestHandler<APIGatewayV2CustomAuthorizerEvent, 
         )
 
         var token = input?.headers?.get("Authorization") // case.. sensitive...
-        if (token!= null ){
+        if (token== null ){
             token = input?.headers?.get("authorization")
         }
 
         val secret = getValue(config.AUTHENTICATOR_KEY)
 
-        return if (token != secret) {
-            logger?.log(denyPolicy.toString())
-            denyPolicy
-        }else{
-            logger?.log(allowPolicy.toString())
-            allowPolicy
-        }
+        var policy = denyPolicy
+        if (token == secret) {
+            policy = allowPolicy
+        }else
+            logger?.log("Failure")
+
+        logger?.log(policy.toString())
+        return policy
 
     }
 

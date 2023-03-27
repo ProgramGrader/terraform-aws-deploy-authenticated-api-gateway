@@ -1,7 +1,6 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent
 import model.*
-import org.apache.http.client.params.AuthPolicy
 
 import org.junit.jupiter.api.Test
 
@@ -46,8 +45,8 @@ class TestLambdaAuthorizer {
         val request = APIGatewayV2CustomAuthorizerEvent()
         val context = DummyContext()
 
-        request.routeArn = "arn:aws:execute-api:us-east-1:123456789012:example/prod/POST/{proxy+}"
-        request.requestContext.http.method = "POST"
+      //  request.routeArn = "arn:aws:execute-api:us-east-1:123456789012:example/prod/POST/{proxy+}"
+    //    request.requestContext.http.method = "POST"
 
 
         val headerMap= mutableMapOf<String,String>()
