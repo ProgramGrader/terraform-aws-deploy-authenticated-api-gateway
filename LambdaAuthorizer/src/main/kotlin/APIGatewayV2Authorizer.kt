@@ -38,7 +38,10 @@ class APIGatewayV2Authorizer: RequestHandler<APIGatewayV2CustomAuthorizerEvent, 
             isAuthorized = true
         )
 
-        val token = input?.headers?.get("Authorization")
+        var token = input?.headers?.get("Authorization") // case.. sensitive...
+        if (token!= null ){
+            token = input?.headers?.get("authorization")
+        }
 
         val secret = getValue(config.AUTHENTICATOR_KEY)
 
