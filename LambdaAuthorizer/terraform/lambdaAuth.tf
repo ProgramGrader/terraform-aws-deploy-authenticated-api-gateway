@@ -1,3 +1,5 @@
+
+#Deploying api gateway authorizers
 module "Deployer"{
   source = "git::git@github.com:ProgramGrader/terraform-aws-kotlin-image-deploy-lambda.git"
   account_id= "048962136615"
@@ -71,6 +73,8 @@ resource "aws_iam_role_policy" "invocation_policy_APIGatewayV1Authorizer" {
 }
 EOF
 }
+
+
 resource "aws_iam_role_policy" "invocation_policy_APIGatewayV2Authorizer" {
   #  for_each = module.Deployer[]
   name = "invocation_policy_APIGatewayV2Authorizer"
@@ -94,8 +98,30 @@ resource "aws_iam_role_policy_attachment" "attach_api_gw_v1_sm_perm"{
   policy_arn = aws_iam_policy.secrets-manager-policy.arn
   role       = module.Deployer.lambda_role_name["APIGatewayV1Authorizer"]
 }
+
+
 resource "aws_iam_role_policy_attachment" "attach_api_gw_v2_sm_perm"{
   policy_arn = aws_iam_policy.secrets-manager-policy.arn
+  role       = module.Deployer.lambda_role_name["APIGatewayV2Authorizer"]
+}
+
+
+resource "aws_iam_policy" "api_gateway_policy" {
+  name        = "api_gateway_policy"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = ["lambda:InvokeFunction"]
+        Resource = ["*"]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "api_gateway_role" {
+  policy_arn = aws_iam_policy.api_gateway_policy.arn
   role       = module.Deployer.lambda_role_name["APIGatewayV2Authorizer"]
 }
 
@@ -126,3 +152,5 @@ resource "aws_secretsmanager_secret_version" "version" {
   secret_id = aws_secretsmanager_secret.secret.id
   secret_string = random_id.api_auth.id
 }
+
+

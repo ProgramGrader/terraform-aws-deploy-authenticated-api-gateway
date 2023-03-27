@@ -48,20 +48,18 @@ resource "aws_lambda_permission" "allow_apigw_to_trigger_Greeting_lambda" {
 }
 
 
-
-
 resource "aws_apigatewayv2_stage" "stage" {
   api_id = module.authenticated_api_gateway.apiv2_gateway_id
   name   = "$default"
   default_route_settings {
-    logging_level = "INFO"
+    logging_level = "ERROR"
     detailed_metrics_enabled = true
     throttling_rate_limit =20000
     throttling_burst_limit = 10000
   }
   access_log_settings {
-    destination_arn = aws_iam_role.cloudwatch.arn
-    format          = "$context.requestId"
+    destination_arn = aws_cloudwatch_log_group.api_gateway_logs.arn
+    format          = "$context.requestId, $context.authorizer.error"
   }
 
   auto_deploy =true
@@ -71,7 +69,7 @@ resource "aws_apigatewayv2_stage" "stage" {
 resource "aws_apigatewayv2_integration" "api_integration" {
   api_id = module.authenticated_api_gateway.apiv2_gateway_id
   integration_type   = "AWS_PROXY"
-  integration_uri    =module.Deployer.lambda_invoke_arn["AuthorizerCerbos"]
+  integration_uri   =module.Deployer.lambda_invoke_arn["GreetingLambdaV2"]
   integration_method = "POST"
   payload_format_version = "2.0"
 }
@@ -84,15 +82,15 @@ resource "aws_apigatewayv2_route" "route" {
   target = "integrations/${aws_apigatewayv2_integration.api_integration.id}"
 
 }
-
-// CREATING CLOUDWATCH LOG GROUP
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
-  name = "/aws/apigateway/${module.authenticated_api_gateway.apigateway_name}"
+  name = "/aws/vendedlogs/${module.authenticated_api_gateway.apigateway_name}"
 }
 
 resource "aws_api_gateway_account" "cloudwatch" {
   cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
 }
+
+
 resource "aws_iam_role" "cloudwatch" {
   name               = "api_gateway_cloudwatch"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json

@@ -1,6 +1,4 @@
 
-// This file needs to be in the same directory as the lambda, for simplicity
-
 output "apiv1_gateway_id" {
   value = var.gateway_version == 1 ? aws_api_gateway_rest_api.apiv1[0].id : null
 }

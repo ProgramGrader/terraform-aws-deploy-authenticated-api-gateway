@@ -34,7 +34,7 @@ module "Deployer" {
     Type    = "lambda"
     Version = "latest"
     }
-  lambda_file_name                = ["GreetingLambda"]
+  lambda_file_name                = ["GreetingLambdaV1"]
   region                          = var.region
 }
 

@@ -1,7 +1,7 @@
 package model
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class AuthPolicy(
+data class AuthPolicyV1(
     @JsonProperty("principalId")
     val principalId: String,
     @JsonProperty("policyDocument")

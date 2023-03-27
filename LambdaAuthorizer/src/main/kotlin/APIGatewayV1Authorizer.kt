@@ -1,10 +1,7 @@
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent
-import model.AuthPolicy
-import model.Config
-import model.PolicyDocument
-import model.Statement
+import model.*
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest
@@ -12,14 +9,14 @@ import javax.inject.Named
 
 
 @Named("APIGatewayV1Authorizer")
-class APIGatewayV1Authorizer: RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicy> {
+class APIGatewayV1Authorizer: RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicyV1> {
 
     private val config = Config().build()
 
-    override fun handleRequest(input: APIGatewayCustomAuthorizerEvent?, context: Context?): AuthPolicy {
+    override fun handleRequest(input: APIGatewayCustomAuthorizerEvent?, context: Context?): AuthPolicyV1 {
         val logger = context?.logger
 
-        val allowPolicy = AuthPolicy(
+        val allowPolicy = AuthPolicyV1(
             principalId = "1",
             policyDocument = PolicyDocument(
                 version = "2012-10-17",
@@ -33,7 +30,7 @@ class APIGatewayV1Authorizer: RequestHandler<APIGatewayCustomAuthorizerEvent, Au
             )
         )
 
-        val denyPolicy = AuthPolicy(
+        val denyPolicy = AuthPolicyV1(
             principalId = "0",
             policyDocument = PolicyDocument(
                 version = "2012-10-17",
