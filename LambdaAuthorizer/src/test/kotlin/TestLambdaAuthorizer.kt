@@ -1,8 +1,7 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent
-import model.AuthPolicy
-import model.PolicyDocument
-import model.Statement
+import model.*
+import org.apache.http.client.params.AuthPolicy
 
 import org.junit.jupiter.api.Test
 
@@ -24,7 +23,7 @@ class TestLambdaAuthorizer {
         // Calling v1 Authorizer
         val context = DummyContext()
         val v1lambdaResponse = APIGatewayV1Authorizer().handleRequest(request, context)
-        val testResponsev1 = AuthPolicy(
+        val testResponsev1 = AuthPolicyV1(
         principalId = "0",
         policyDocument = PolicyDocument(
             version = "2012-10-17",
@@ -54,7 +53,7 @@ class TestLambdaAuthorizer {
         val headerMap= mutableMapOf<String,String>()
         headerMap["Authorization"] = "badtoken"
         request.headers = headerMap
-        val testResponsev2 = "{\"isAuthorized\": false}"
+        val testResponsev2 = AuthPolicyV2(isAuthorized = false)
         val v2lambdaResponse = APIGatewayV2Authorizer().handleRequest(request, context)
         assert(v2lambdaResponse == testResponsev2 )
     }
