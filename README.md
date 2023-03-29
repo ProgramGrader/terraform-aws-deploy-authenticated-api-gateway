@@ -1,5 +1,5 @@
 <!-- markdownlint-disable -->
-# terraform-deploy-authenticated-openapi-gateway
+# terraform-aws-deploy-authenticated-api-gateway
 
 ---
 This module is responsible for creating and authenticating a aws rest api gateway
