@@ -1,7 +1,8 @@
 
 #Deploying api gateway authorizers
 module "Deployer"{
-  source = "git::git@github.com:ProgramGrader/terraform-aws-kotlin-image-deploy-lambda.git"
+  source  = "app.terraform.io/zacclifton/kotlin-image-deploy-lambda/aws"
+  version = "0.0.8"
   account_id= "048962136615"
   ecr_tags = {
     Type    = "lambda"
