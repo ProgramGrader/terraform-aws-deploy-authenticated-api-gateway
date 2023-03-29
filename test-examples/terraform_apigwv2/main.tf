@@ -44,12 +44,12 @@ resource "aws_lambda_permission" "allow_apigw_to_trigger_Greeting_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = "GreetingLambdaV2"
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${module.authenticated_api_gateway.apiv2_gateway_execution_arn}/*/*"
+  source_arn    = "${module.authenticated_api_gateway.api_gateway_execution_arn}/*/*"
 }
 
 
 resource "aws_apigatewayv2_stage" "stage" {
-  api_id = module.authenticated_api_gateway.apiv2_gateway_id
+  api_id = module.authenticated_api_gateway.api_gateway_id
   name   = "$default"
   default_route_settings {
     logging_level = "ERROR"
@@ -67,7 +67,7 @@ resource "aws_apigatewayv2_stage" "stage" {
 
 
 resource "aws_apigatewayv2_integration" "api_integration" {
-  api_id = module.authenticated_api_gateway.apiv2_gateway_id
+  api_id = module.authenticated_api_gateway.api_gateway_id
   integration_type   = "AWS_PROXY"
   integration_uri   =module.Deployer.lambda_invoke_arn["GreetingLambdaV2"]
   integration_method = "POST"
@@ -75,10 +75,10 @@ resource "aws_apigatewayv2_integration" "api_integration" {
 }
 
 resource "aws_apigatewayv2_route" "route" {
-  api_id = module.authenticated_api_gateway.apiv2_gateway_id
+  api_id = module.authenticated_api_gateway.api_gateway_id
   route_key = "GET /name" //var.api_route_key
   authorization_type = "CUSTOM"
-  authorizer_id = module.authenticated_api_gateway.v2authorizer_id
+  authorizer_id = module.authenticated_api_gateway.authorizer_id
   target = "integrations/${aws_apigatewayv2_integration.api_integration.id}"
 
 }

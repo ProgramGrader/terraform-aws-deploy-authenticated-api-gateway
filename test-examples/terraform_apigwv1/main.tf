@@ -44,23 +44,23 @@ resource "aws_lambda_permission" "allow_apigw_to_trigger_Greeting_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = "GreetingLambda"
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${module.authenticated_api_gateway.apiv1_gateway_execution_arn}/*/*"
+  source_arn    = "${module.authenticated_api_gateway.apigateway_name}/*/*"
 }
 
 resource "aws_api_gateway_resource" "greeting_resource" {
   depends_on = [module.authenticated_api_gateway]
   parent_id   = module.authenticated_api_gateway.apiv1_gateway_root_resource_id
   path_part   = "name"
-  rest_api_id = module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id = module.authenticated_api_gateway.api_gateway_id
 }
 
 resource "aws_api_gateway_method" "GET" {
   depends_on = [module.authenticated_api_gateway]
   authorization = "Custom"
-  authorizer_id = module.authenticated_api_gateway.v1authorizer_id
+  authorizer_id = module.authenticated_api_gateway.authorizer_id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.greeting_resource.id
-  rest_api_id   = module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id   = module.authenticated_api_gateway.api_gateway_id
 
   request_parameters = {
     "method.request.path.proxy" = true
@@ -72,14 +72,14 @@ resource "aws_api_gateway_integration" "integrate_get" {
   http_method             = aws_api_gateway_method.GET.http_method
   integration_http_method = "POST"
   resource_id             = aws_api_gateway_resource.greeting_resource.id
-  rest_api_id             = module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id             = module.authenticated_api_gateway.api_gateway_id
   type                    = "AWS_PROXY"
   uri                     = module.Deployer.lambda_invoke_arn["GreetingLambda"]
 }
 
 resource "aws_api_gateway_deployment" "deploy" {
   depends_on = [aws_api_gateway_integration.integrate_get]
-  rest_api_id = module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id = module.authenticated_api_gateway.api_gateway_id
 
   lifecycle {
     create_before_destroy = true
@@ -90,12 +90,12 @@ resource "aws_api_gateway_deployment" "deploy" {
 
 resource "aws_api_gateway_stage" "dev"{
   deployment_id = aws_api_gateway_deployment.deploy.id
-  rest_api_id= module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id= module.authenticated_api_gateway.api_gateway_id
   stage_name    = "dev"
   xray_tracing_enabled = true
 }
 resource "aws_api_gateway_method_settings" "general_settings" {
-  rest_api_id = module.authenticated_api_gateway.apiv1_gateway_id
+  rest_api_id = module.authenticated_api_gateway.api_gateway_id
   stage_name  = aws_api_gateway_stage.dev.stage_name
   method_path = "*/*"
 

@@ -6,7 +6,6 @@ import lambdas.GreetingLambdaV1
 import lambdas.GreetingLambdaV2
 import org.junit.jupiter.api.Test
 
-@QuarkusTest
 class GreetingLambdaTest {
     // private final val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:0.11.3");
 
