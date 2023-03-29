@@ -129,12 +129,11 @@ resource "aws_iam_role_policy_attachment" "api_gateway_role" {
 
 resource "aws_secretsmanager_secret" "secret" {
 
-  name = "APIAuthenticationToken"
+  name = var.api_key_name
   recovery_window_in_days = 0
   force_overwrite_replica_secret = true
 
 }
-
 
 resource "aws_ssm_parameter" "auth_key" {
   name  = "csgrader-AUTHENTICATION_KEY"
@@ -149,15 +148,10 @@ resource "aws_ssm_parameter" "auth_key" {
   // migrate state to terraform cloud
   // hop on the github ms
 
-resource "random_id" "api_auth" {
-  // count = var.authenticator_exists == false ? 0 : 1
-  byte_length = 32
-}
-
 resource "aws_secretsmanager_secret_version" "version" {
   //count = var.authenticator_exists == false ? 0 : 1
   secret_id = aws_secretsmanager_secret.secret.id
-  secret_string = random_id.api_auth.id
+  secret_string = var.api_key_value
 }
 
 
