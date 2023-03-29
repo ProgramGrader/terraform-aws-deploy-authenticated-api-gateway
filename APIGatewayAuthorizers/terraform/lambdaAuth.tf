@@ -141,10 +141,16 @@ resource "aws_ssm_parameter" "auth_key" {
   value = aws_secretsmanager_secret.secret.name
   overwrite = true
 }
+// TODO
+  // create a 32 character key and store in terraform cloud and then deploy lambdaAuthorizer and module seperatly in terrafomr cloud and  trigger lambda authorizer everytime the module is updated
+  // find a way to trigger lambdas based off ecs repo updates
+  // finish deploying everything to terraform cloud
+  // migrate state to terraform cloud
+  // hop on the github ms
 
 resource "random_id" "api_auth" {
   // count = var.authenticator_exists == false ? 0 : 1
-  byte_length = 8
+  byte_length = 32
 }
 
 resource "aws_secretsmanager_secret_version" "version" {

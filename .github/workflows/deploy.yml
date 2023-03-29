@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         images: [APIGatewayV1Authorizer, APIGatewayV2Authorizer]
-        working_dir: [LambdaAuthorizer/]
+        working_dir: [APIGatewayAuthorizers/]
     # ECR_REPOSITORY: ACTUAL NAME OF THE ECR
     steps:
       - name: Check out code
