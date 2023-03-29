@@ -8,7 +8,7 @@ output "apiv1_gateway_root_resource_id" {
 }
 
 output "api_gateway_execution_arn" {
-  value = var.gateway_version == 1 ? aws_api_gateway_rest_api.apiv1[0].execution_arn: aws_apigatewayv2_api.apiv2[0]
+  value = var.gateway_version == 1 ? aws_api_gateway_rest_api.apiv1[0].execution_arn: aws_apigatewayv2_api.apiv2[0].execution_arn
 }
 
 output "authorizer_id" {
